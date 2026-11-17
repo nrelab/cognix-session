@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6 # v6.0.2
+
+
+    - name: Run cargo fmt
+      run: cargo fmt --check
+
+    - name: Run cargo clippy
+      run: cargo clippy --all-targets --all-features -- -D warnings
+
+    - name: Install cargo nextest
+      uses: taiki-e/install-action@v2.75.18 # v2.75.18
+      with:
+        tool: nextest
+
+    - name: Run tests
+      run: cargo nextest run --workspace --no-tests=warn
